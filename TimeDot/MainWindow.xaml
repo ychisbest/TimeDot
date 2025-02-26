@@ -1,4 +1,4 @@
-﻿<Window x:Class="TimeGrid.MainWindow"
+﻿<Window x:Class="TimeDot.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         ResizeMode="CanResizeWithGrip"
@@ -6,22 +6,31 @@
         WindowStyle="None"
         Topmost="True"
         AllowsTransparency="True"
-        
         ShowInTaskbar="False"
-        Title="ADHD 时间感知" Height="160" Width="700" MouseLeftButtonDown="Window_MouseLeftButtonDown">
+        xmlns:local="clr-namespace:TimeDot"
+        x:Name="Window"
+        Title="ADHD 时间感知" Height="200" Width="700" MouseLeftButtonDown="Window_MouseLeftButtonDown">
+    <Window.Resources>
+        <local:BorderColorConverter x:Key="BorderColorConverter"></local:BorderColorConverter>
+    </Window.Resources>
     <WindowChrome.WindowChrome>
         <WindowChrome CaptionHeight="0"
                       GlassFrameThickness="-1"
                       ResizeBorderThickness="5"
                       ></WindowChrome>
     </WindowChrome.WindowChrome>
-    <Border CornerRadius="10" Background="#88000000" Padding="5">
+    <Border CornerRadius="5" Background="#88000000" Padding="10" BorderThickness="1" BorderBrush="{Binding ElementName=Window,Path=Topmost,Converter={StaticResource BorderColorConverter}}">
         
         <Border.ContextMenu>
             <ContextMenu>
-            <MenuItem Header="Exit" Click="ExitClick">
-                
-            </MenuItem>
+                <MenuItem Header="Topmost"  Click="TopmostClick">
+                </MenuItem>
+                <MenuItem Header="About" Click="AboutClick">
+                    
+                </MenuItem>
+                <MenuItem Header="Exit" Click="ExitClick">
+
+                </MenuItem>
             </ContextMenu>
         </Border.ContextMenu>
         <Viewbox>

@@ -1,0 +1,78 @@
+name: TimeDot Build and Release
+
+on:
+  push:
+    branches: [ main, master ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+permissions:
+  contents: write  # 创建发布所需
+  id-token: write  # 上传资产所需
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1.1
+      
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v1.1.1
+      
+    - name: Restore NuGet packages
+      run: nuget restore TimeDot.sln
+      
+    - name: Extract version from AssemblyInfo
+      id: extract_version
+      shell: powershell
+      run: |
+        $versionInfo = Get-Content -Path "TimeDot\Properties\AssemblyInfo.cs" | Select-String -Pattern 'AssemblyVersion\("([0-9]+\.[0-9]+\.[0-9]+)'
+        if ($versionInfo -match 'AssemblyVersion\("([0-9]+\.[0-9]+\.[0-9]+)') {
+          $version = $matches[1]
+          echo "version=$version" >> $env:GITHUB_OUTPUT
+          echo "Extracted version: $version"
+        } else {
+          echo "Failed to extract version, using default"
+          echo "version=1.0.0" >> $env:GITHUB_OUTPUT
+        }
+    
+    - name: Build solution
+      run: msbuild TimeDot.sln /p:Configuration=Release /p:Platform="Any CPU"
+      
+    - name: Create release package
+      shell: powershell
+      run: |
+        New-Item -ItemType Directory -Force -Path .\Release
+        Copy-Item -Path "TimeDot\bin\Release\*" -Destination ".\Release\" -Recurse
+        Compress-Archive -Path ".\Release\*" -DestinationPath ".\TimeDot-${{ steps.extract_version.outputs.version }}.zip"
+    
+    - name: Create Release
+      id: create_release
+      if: github.event_name != 'pull_request'
+      uses: actions/create-release@v1
+      with:
+        tag_name: v${{ steps.extract_version.outputs.version }}
+        release_name: TimeDot v${{ steps.extract_version.outputs.version }}
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Upload Release Asset
+      if: github.event_name != 'pull_request'
+      uses: actions/upload-release-asset@v1
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./TimeDot-${{ steps.extract_version.outputs.version }}.zip
+        asset_name: TimeDot-${{ steps.extract_version.outputs.version }}.zip
+        asset_content_type: application/zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

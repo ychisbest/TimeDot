@@ -20,8 +20,9 @@ using Brushes = System.Windows.Media.Brushes;
 using Brush = System.Windows.Media.Brush;
 using System.Security.Policy;
 using Application = System.Windows.Application;
+using Color = System.Windows.Media.Color;
 
-namespace TimeGrid
+namespace TimeDot
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -119,7 +120,7 @@ namespace TimeGrid
             var now = DateTime.Now;
             var currentHour = now.Hour;
             var currentMinute = now.Minute - 1;
-            const int startHour = 8;
+            const int startHour = 0;
             const int endHour = 24;
             var hours = new List<HourData>();
 
@@ -206,14 +207,39 @@ namespace TimeGrid
             this.DragMove();
         }
 
-        private void Window_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            Topmost = !Topmost;
-        }
 
         private void ExitClick(object sender, RoutedEventArgs e)
         {
-           Application.Current.Shutdown();
+            Application.Current.Shutdown();
+        }
+
+        private void AboutClick(object sender, RoutedEventArgs e)
+        {
+            var result = System.Windows.MessageBox.Show("This is version V0.0.1 beta,more function is under development. Would you like to visit the official website?", "About", MessageBoxButton.YesNo, MessageBoxImage.Information);
+            if (result == MessageBoxResult.Yes)
+            {
+                Process.Start(new ProcessStartInfo("https://timedot.net") { UseShellExecute = true });
+            }
+        }
+
+        private void TopmostClick(object sender, RoutedEventArgs e)
+        {
+            Topmost = !Topmost;
+        }
+    }
+
+    public class BorderColorConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            if ((bool)value)
+                return new SolidColorBrush(Colors.Red);
+            else
+                return new SolidColorBrush( Colors.Transparent);
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return value;
         }
     }
 }
