@@ -1,0 +1,94 @@
+﻿<Window x:Class="TimeGrid.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        ResizeMode="CanResizeWithGrip"
+        Background="Transparent"
+        WindowStyle="None"
+        Topmost="True"
+        AllowsTransparency="True"
+        
+        ShowInTaskbar="False"
+        Title="ADHD 时间感知" Height="160" Width="700" MouseLeftButtonDown="Window_MouseLeftButtonDown">
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="0"
+                      GlassFrameThickness="-1"
+                      ResizeBorderThickness="5"
+                      ></WindowChrome>
+    </WindowChrome.WindowChrome>
+    <Border CornerRadius="10" Background="#88000000" Padding="5">
+        
+        <Border.ContextMenu>
+            <ContextMenu>
+            <MenuItem Header="Exit" Click="ExitClick">
+                
+            </MenuItem>
+            </ContextMenu>
+        </Border.ContextMenu>
+        <Viewbox>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <ItemsControl Grid.Row="1" x:Name="TimeGrid">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Columns="8"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Vertical" Margin="5 0">
+                                <TextBlock Text="{Binding HourLabel}" 
+                                       Foreground="White"
+                                      FontSize="12" FontWeight="Bold" 
+                                      HorizontalAlignment="Center" Margin="0,0,0,5"/>
+                                <ItemsControl ItemsSource="{Binding Minutes}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <UniformGrid Columns="10"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Rectangle Width="4" Height="4" Margin="1 2" Name="r"
+                                                  Fill="{Binding Color}">
+                                                <Rectangle.RenderTransform>
+                                                    <ScaleTransform CenterX="2" CenterY="2"/>
+                                                </Rectangle.RenderTransform>
+                                            </Rectangle>
+                                            <DataTemplate.Triggers>
+                                                <DataTrigger Binding="{Binding IsCurrent}" Value="true">
+                                                    <DataTrigger.EnterActions>
+                                                        <BeginStoryboard>
+                                                            <Storyboard>
+                                                                <DoubleAnimation
+                                                                Storyboard.TargetName="r"
+                                                                            Storyboard.TargetProperty="(Rectangle.RenderTransform).(ScaleTransform.ScaleY)"
+                                                                            From="1" To="3" Duration="0:0:0.3"
+                                                                            AutoReverse="True" RepeatBehavior="Forever"/>
+                                                                <DoubleAnimation
+                                                                Storyboard.TargetName="r"
+                                                                            Storyboard.TargetProperty="(Rectangle.RenderTransform).(ScaleTransform.ScaleX)"
+                                                                            From="1" To="3" Duration="0:0:0.3"
+                                                                            AutoReverse="True" RepeatBehavior="Forever"/>
+                                                            </Storyboard>
+                                                        </BeginStoryboard>
+                                                    </DataTrigger.EnterActions>
+
+                                                </DataTrigger>
+
+                                            </DataTemplate.Triggers>
+
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Grid>
+        </Viewbox>
+    </Border>
+</Window>
