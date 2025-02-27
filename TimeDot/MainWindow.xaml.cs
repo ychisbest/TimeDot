@@ -21,6 +21,8 @@ using Brush = System.Windows.Media.Brush;
 using System.Security.Policy;
 using Application = System.Windows.Application;
 using Color = System.Windows.Media.Color;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace TimeDot
 {
@@ -55,7 +57,8 @@ namespace TimeDot
         }
 
         private DispatcherTimer timer;
-
+        private Task _backTask;
+        private CancellationTokenSource _cts; // 用于取消任务的Token源
 
         private NotifyIcon notifyIcon;
         public MainWindow()
@@ -66,6 +69,7 @@ namespace TimeDot
 
             this.SourceInitialized += MainWindow_SourceInitialized;
             this.Loaded += MainWindow_Loaded;
+
 
             // 创建托盘图标
             notifyIcon = new NotifyIcon();
@@ -78,6 +82,7 @@ namespace TimeDot
 
             // 在关闭窗口时隐藏窗口而不是退出应用
             this.Closing += MainWindow_Closing;
+            this.IsVisibleChanged += MainWindow_IsVisibleChanged;
 
             // 创建右键菜单
             var contextMenu = new System.Windows.Forms.ContextMenu();
@@ -92,6 +97,18 @@ namespace TimeDot
             timer.Interval = TimeSpan.FromSeconds(5);
             timer.Tick += (s, e) => UpdateTimeGrid();
             timer.Start();
+        }
+
+        private void MainWindow_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (this.IsVisible)
+            {
+                if (_cts != null)
+                {
+                    _cts.Cancel();
+                    _cts.Dispose();
+                }
+            }
         }
 
         // 右键菜单退出事件
@@ -226,6 +243,63 @@ namespace TimeDot
         {
             Topmost = !Topmost;
         }
+
+        private async void doubleClick(object sender, MouseButtonEventArgs e)
+        {
+            await hiden();
+        }
+
+        private async void hidenClick(object sender, RoutedEventArgs e)
+        {
+            await hiden();
+        }
+
+        private async Task hiden()
+        {
+            // 取消之前的任务并释放资源
+            if (_cts != null)
+            {
+                _cts.Cancel();
+                _cts.Dispose();
+            }
+
+            // 创建新的CancellationTokenSource
+            _cts = new CancellationTokenSource();
+            var token = _cts.Token;
+
+            this.ShowActivated = false;
+            this.Hide();
+
+            // 启动后台任务并传入取消Token
+            _backTask = Task.Run(async () =>
+            {
+                try
+                {
+                    // 等待5分钟，期间响应取消请求
+                    await Task.Delay(5 * 60 * 1000, token);
+
+                    // 再次检查是否已取消（可能在Delay完成后被取消）
+                    if (token.IsCancellationRequested)
+                        return;
+
+                    // 在UI线程更新窗口状态
+                    await this.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        // 最终确认未被取消后执行显示操作
+                        if (!token.IsCancellationRequested)
+                        {
+                            this.Show();
+                            this.WindowState = WindowState.Normal;
+                        }
+                    }));
+                }
+                catch (OperationCanceledException)
+                {
+                    // 任务被取消时的预期异常，无需处理
+                }
+            }, token);
+        }
+
     }
 
     public class BorderColorConverter : IValueConverter
@@ -233,7 +307,7 @@ namespace TimeDot
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             if ((bool)value)
-                return new SolidColorBrush(Colors.Red);
+                return new SolidColorBrush(Colors.LightBlue);
             else
                 return new SolidColorBrush( Colors.Transparent);
         }

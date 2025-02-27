@@ -9,7 +9,7 @@
         ShowInTaskbar="False"
         xmlns:local="clr-namespace:TimeDot"
         x:Name="Window"
-        Title="ADHD 时间感知" Height="200" Width="700" MouseLeftButtonDown="Window_MouseLeftButtonDown">
+        Title="ADHD 时间感知" Height="200" Width="700" MouseLeftButtonDown="Window_MouseLeftButtonDown" MouseDoubleClick="doubleClick">
     <Window.Resources>
         <local:BorderColorConverter x:Key="BorderColorConverter"></local:BorderColorConverter>
     </Window.Resources>
@@ -23,6 +23,8 @@
         
         <Border.ContextMenu>
             <ContextMenu>
+                <MenuItem Header="Hide for five minutes"  Click="hidenClick">
+                </MenuItem>
                 <MenuItem Header="Topmost"  Click="TopmostClick">
                 </MenuItem>
                 <MenuItem Header="About" Click="AboutClick">
