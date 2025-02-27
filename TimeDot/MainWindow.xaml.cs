@@ -224,8 +224,6 @@ namespace TimeDot
             this.DragMove();
         }
 
-<<<<<<< HEAD
-
         private void ExitClick(object sender, RoutedEventArgs e)
         {
             Application.Current.Shutdown();
@@ -244,12 +242,11 @@ namespace TimeDot
         {
             Topmost = !Topmost;
         }
-=======
->>>>>>> 485ca1b1eefa302017f1d5761b88bd8628cc711f
+
 
         private async void doubleClick(object sender, MouseButtonEventArgs e)
         {
-<<<<<<< HEAD
+
             await hiden();
         }
 
@@ -304,24 +301,7 @@ namespace TimeDot
             }, token);
         }
 
-=======
-            Application.Current.Shutdown();
-        }
 
-        private void AboutClick(object sender, RoutedEventArgs e)
-        {
-            var result = System.Windows.MessageBox.Show("This is version V0.0.1 beta,more function is under development. Would you like to visit the official website?", "About", MessageBoxButton.YesNo, MessageBoxImage.Information);
-            if (result == MessageBoxResult.Yes)
-            {
-                Process.Start(new ProcessStartInfo("https://timedot.net") { UseShellExecute = true });
-            }
-        }
-
-        private void TopmostClick(object sender, RoutedEventArgs e)
-        {
-            Topmost = !Topmost;
-        }
->>>>>>> 485ca1b1eefa302017f1d5761b88bd8628cc711f
     }
 
     public class BorderColorConverter : IValueConverter
@@ -329,11 +309,8 @@ namespace TimeDot
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             if ((bool)value)
-<<<<<<< HEAD
                 return new SolidColorBrush(Colors.LightBlue);
-=======
-                return new SolidColorBrush(Colors.Red);
->>>>>>> 485ca1b1eefa302017f1d5761b88bd8628cc711f
+
             else
                 return new SolidColorBrush( Colors.Transparent);
         }
