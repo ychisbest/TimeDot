@@ -1,0 +1,85 @@
+name: Build and Release WPF App
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:  # 允许手动触发工作流
+
+jobs:
+  build:
+    runs-on: windows-latest  # 需要Windows来构建WPF应用
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # 获取完整历史记录用于版本确定
+    
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1.1
+    
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v1
+      
+    - name: Restore NuGet packages
+      run: nuget restore YourSolution.sln  # 请替换为您的解决方案文件名
+    
+    - name: Extract version from AssemblyInfo
+      id: extract_version
+      shell: powershell
+      run: |
+        # 从AssemblyInfo.cs或项目文件中提取版本号
+        $versionInfo = Select-String -Path "YourProject/Properties/AssemblyInfo.cs" -Pattern 'AssemblyVersion\("([0-9]+\.[0-9]+\.[0-9]+).*"\)'
+        if ($versionInfo) {
+          $version = $versionInfo.Matches.Groups[1].Value
+        } else {
+          # 如果没有AssemblyInfo，尝试从.csproj文件中提取
+          $projectFile = Get-Content "YourProject/YourProject.csproj"
+          $versionInfo = $projectFile | Select-String -Pattern '<Version>([0-9]+\.[0-9]+\.[0-9]+)</Version>'
+          if ($versionInfo) {
+            $version = $versionInfo.Matches.Groups[1].Value
+          } else {
+            # 如果都没有找到，使用默认版本
+            $version = "1.0.0"
+          }
+        }
+        echo "VERSION=$version" >> $env:GITHUB_OUTPUT
+        echo "Version extracted: $version"
+    
+    - name: Build application
+      run: |
+        msbuild YourSolution.sln /p:Configuration=Release /p:Platform="Any CPU" /p:OutputPath=bin\Release
+    
+    - name: Create artifact directory
+      run: mkdir artifacts
+    
+    - name: Package application
+      shell: powershell
+      run: |
+        $version = "${{ steps.extract_version.outputs.VERSION }}"
+        $releaseDir = "YourProject/bin/Release"  # 调整为您的项目输出路径
+        $zipFileName = "YourAppName-v$version.zip"
+        
+        # 复制需要的文件到临时目录
+        New-Item -ItemType Directory -Path ".\temp" -Force
+        Copy-Item -Path "$releaseDir\*" -Destination ".\temp\" -Recurse -Force
+        
+        # 压缩应用程序
+        Compress-Archive -Path ".\temp\*" -DestinationPath ".\artifacts\$zipFileName" -Force
+        
+        # 清理临时目录
+        Remove-Item -Path ".\temp" -Recurse -Force
+
+    - name: Create release
+      id: create_release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: v${{ steps.extract_version.outputs.VERSION }}
+        name: Release v${{ steps.extract_version.outputs.VERSION }}
+        draft: false
+        prerelease: false
+        files: |
+          artifacts/*.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
