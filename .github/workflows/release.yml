@@ -50,25 +50,45 @@ jobs:
         Copy-Item -Path "TimeDot\bin\Release\*" -Destination ".\Release\" -Recurse
         Compress-Archive -Path ".\Release\*" -DestinationPath ".\TimeDot-${{ steps.extract_version.outputs.version }}.zip"
     
-    - name: Create Release
-      id: create_release
+    - name: Create Release and Upload Asset
       if: github.event_name != 'pull_request'
-      uses: actions/create-release@v1
+      uses: actions/github-script@v6
       with:
-        tag_name: v${{ steps.extract_version.outputs.version }}
-        release_name: TimeDot v${{ steps.extract_version.outputs.version }}
-        draft: false
-        prerelease: false
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        
-    - name: Upload Release Asset
-      if: github.event_name != 'pull_request'
-      uses: actions/upload-release-asset@v1
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./TimeDot-${{ steps.extract_version.outputs.version }}.zip
-        asset_name: TimeDot-${{ steps.extract_version.outputs.version }}.zip
-        asset_content_type: application/zip
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const fs = require('fs');
+          const { owner, repo } = context.repo;
+          const version = '${{ steps.extract_version.outputs.version }}';
+          
+          // Create a release
+          console.log(`Creating release v${version}...`);
+          const release = await github.rest.repos.createRelease({
+            owner,
+            repo,
+            tag_name: `v${version}`,
+            name: `TimeDot v${version}`,
+            draft: false,
+            prerelease: false
+          });
+          
+          // Upload the asset
+          console.log(`Uploading release asset...`);
+          const assetPath = `./TimeDot-${version}.zip`;
+          const assetName = `TimeDot-${version}.zip`;
+          
+          // Read the file
+          const contentBytes = fs.readFileSync(assetPath);
+          const contentType = 'application/zip';
+          
+          // Upload to the release
+          await github.rest.repos.uploadReleaseAsset({
+            owner,
+            repo,
+            release_id: release.data.id,
+            name: assetName,
+            data: contentBytes,
+            headers: {
+              'content-type': contentType,
+              'content-length': contentBytes.length
+            }
+          });
