@@ -23,19 +23,19 @@ jobs:
       uses: NuGet/setup-nuget@v1
       
     - name: Restore NuGet packages
-      run: nuget restore YourSolution.sln  # 请替换为您的解决方案文件名
+      run: nuget restore TimeDot.sln  # 请替换为您的解决方案文件名
     
     - name: Extract version from AssemblyInfo
       id: extract_version
       shell: powershell
       run: |
         # 从AssemblyInfo.cs或项目文件中提取版本号
-        $versionInfo = Select-String -Path "YourProject/Properties/AssemblyInfo.cs" -Pattern 'AssemblyVersion\("([0-9]+\.[0-9]+\.[0-9]+).*"\)'
+        $versionInfo = Select-String -Path "TimeDot/Properties/AssemblyInfo.cs" -Pattern 'AssemblyVersion\("([0-9]+\.[0-9]+\.[0-9]+).*"\)'
         if ($versionInfo) {
           $version = $versionInfo.Matches.Groups[1].Value
         } else {
           # 如果没有AssemblyInfo，尝试从.csproj文件中提取
-          $projectFile = Get-Content "YourProject/YourProject.csproj"
+          $projectFile = Get-Content "TimeDot/TimeDot.csproj"
           $versionInfo = $projectFile | Select-String -Pattern '<Version>([0-9]+\.[0-9]+\.[0-9]+)</Version>'
           if ($versionInfo) {
             $version = $versionInfo.Matches.Groups[1].Value
@@ -49,7 +49,7 @@ jobs:
     
     - name: Build application
       run: |
-        msbuild YourSolution.sln /p:Configuration=Release /p:Platform="Any CPU" /p:OutputPath=bin\Release
+        msbuild TimeDot.sln /p:Configuration=Release /p:Platform="Any CPU" /p:OutputPath=bin\Release
     
     - name: Create artifact directory
       run: mkdir artifacts
@@ -58,8 +58,8 @@ jobs:
       shell: powershell
       run: |
         $version = "${{ steps.extract_version.outputs.VERSION }}"
-        $releaseDir = "YourProject/bin/Release"  # 调整为您的项目输出路径
-        $zipFileName = "YourAppName-v$version.zip"
+        $releaseDir = "TimeDot/bin/Release"  # 调整为您的项目输出路径
+        $zipFileName = "TimeDot-v$version.zip"
         
         # 复制需要的文件到临时目录
         New-Item -ItemType Directory -Path ".\temp" -Force
