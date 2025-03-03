@@ -23,6 +23,7 @@ using Application = System.Windows.Application;
 using Color = System.Windows.Media.Color;
 using System.Threading.Tasks;
 using System.Threading;
+using Newtonsoft.Json;
 
 namespace TimeDot
 {
@@ -65,6 +66,8 @@ namespace TimeDot
         {
             InitializeComponent();
             UpdateTimeGrid();
+
+            JsonConvert.SerializeObject(new { });
 
 
             this.SourceInitialized += MainWindow_SourceInitialized;
@@ -155,7 +158,8 @@ namespace TimeDot
 
                     if (hour < currentHour || (hour == currentHour && minute < currentMinute))
                     {
-                        minuteData.Color = Brushes.DarkGray; // 已过去的时间
+                        minuteData.Color = Brushes.White; 
+
                         minuteData.IsCurrent = false;
                     }
                     else if (hour == currentHour && minute == currentMinute)
@@ -165,7 +169,8 @@ namespace TimeDot
                     }
                     else
                     {
-                        minuteData.Color = Brushes.White; // 未来的时间
+                        minuteData.Color = Brushes.DarkGray; 
+
                         minuteData.IsCurrent = false;
                     }
 
@@ -277,7 +282,7 @@ namespace TimeDot
                 try
                 {
                     // 等待5分钟，期间响应取消请求
-                    await Task.Delay(5 * 60 * 1000, token);
+                    await Task.Delay(60 * 1000, token);
 
                     // 再次检查是否已取消（可能在Delay完成后被取消）
                     if (token.IsCancellationRequested)

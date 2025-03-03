@@ -21,7 +21,7 @@
                       ResizeBorderThickness="5"
                       ></WindowChrome>
     </WindowChrome.WindowChrome>
-    <Border CornerRadius="5" Background="#88000000" Padding="10" BorderThickness="1" BorderBrush="{Binding ElementName=Window,Path=Topmost,Converter={StaticResource BorderColorConverter}}">
+    <Border CornerRadius="5" Background="#AA000000" Padding="10" BorderThickness="1" BorderBrush="{Binding ElementName=Window,Path=Topmost,Converter={StaticResource BorderColorConverter}}">
         
         <Border.ContextMenu>
             <ContextMenu>
