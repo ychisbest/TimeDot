@@ -57,7 +57,6 @@ namespace TimeDot
             public List<MinuteData> Minutes { get; set; }
         }
 
-        private DispatcherTimer timer;
         private Task _backTask;
         private CancellationTokenSource _cts; // 用于取消任务的Token源
 
@@ -65,7 +64,7 @@ namespace TimeDot
         public MainWindow()
         {
             InitializeComponent();
-            UpdateTimeGrid();
+
 
             JsonConvert.SerializeObject(new { });
 
@@ -95,11 +94,7 @@ namespace TimeDot
             contextMenu.MenuItems.Add(exitMenuItem);
             notifyIcon.ContextMenu = contextMenu;
 
-            // 设置定时器每5秒更新一次
-            timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromSeconds(5);
-            timer.Tick += (s, e) => UpdateTimeGrid();
-            timer.Start();
+
         }
 
         private void MainWindow_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -135,53 +130,7 @@ namespace TimeDot
             this.Hide();
         }
 
-        private void UpdateTimeGrid()
-        {
-            var now = DateTime.Now;
-            var currentHour = now.Hour;
-            var currentMinute = now.Minute - 1;
-            const int startHour = 0;
-            const int endHour = 24;
-            var hours = new List<HourData>();
 
-            for (int hour = startHour; hour < endHour; hour++)
-            {
-                var hourData = new HourData
-                {
-                    HourLabel = $"{hour}:00",
-                    Minutes = new List<MinuteData>()
-                };
-
-                for (int minute = 0; minute < 60; minute++)
-                {
-                    var minuteData = new MinuteData();
-
-                    if (hour < currentHour || (hour == currentHour && minute < currentMinute))
-                    {
-                        minuteData.Color = Brushes.White; 
-
-                        minuteData.IsCurrent = false;
-                    }
-                    else if (hour == currentHour && minute == currentMinute)
-                    {
-                        minuteData.Color = Brushes.LightGreen; // 当前分钟
-                        minuteData.IsCurrent = true;
-                    }
-                    else
-                    {
-                        minuteData.Color = Brushes.DarkGray; 
-
-                        minuteData.IsCurrent = false;
-                    }
-
-                    hourData.Minutes.Add(minuteData);
-                }
-
-                hours.Add(hourData);
-            }
-
-            TimeGrid.ItemsSource = hours;
-        }
 
 
         private void MainWindow_SourceInitialized(object sender, EventArgs e)
@@ -309,6 +258,8 @@ namespace TimeDot
 
     }
 
+
+
     public class BorderColorConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
@@ -317,7 +268,7 @@ namespace TimeDot
                 return new SolidColorBrush(Colors.LightBlue);
 
             else
-                return new SolidColorBrush( Colors.Transparent);
+                return new SolidColorBrush(Colors.Transparent);
         }
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
