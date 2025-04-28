@@ -10,7 +10,7 @@
         xmlns:local="clr-namespace:TimeDot"
         x:Name="Window"
         xmlns:view="clr-namespace:TimeDot.views"
-        Title="TimeDot" Height="200" Width="700" MouseLeftButtonDown="Window_MouseLeftButtonDown" MouseDoubleClick="doubleClick">
+        Title="TimeDot" Height="100" Width="400" MouseLeftButtonDown="Window_MouseLeftButtonDown" MouseDoubleClick="doubleClick">
 
     <Window.Resources>
         <local:BorderColorConverter x:Key="BorderColorConverter"></local:BorderColorConverter>
@@ -21,7 +21,7 @@
                       ResizeBorderThickness="5"
                       ></WindowChrome>
     </WindowChrome.WindowChrome>
-    <Border CornerRadius="5" Background="#AA000000" Padding="10" BorderThickness="1" BorderBrush="{Binding ElementName=Window,Path=Topmost,Converter={StaticResource BorderColorConverter}}">
+    <Border CornerRadius="5" Background="#EEFFFFFF" Padding="10" BorderThickness="1" BorderBrush="{Binding ElementName=Window,Path=Topmost,Converter={StaticResource BorderColorConverter}}">
         
         <Border.ContextMenu>
             <ContextMenu>

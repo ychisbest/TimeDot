@@ -47,8 +47,10 @@ namespace TimeDot
         private static extern bool CheckMenuItem(IntPtr hMenu, uint uIDCheckItem, uint uCheck);
         public class MinuteData
         {
+            public int Count { get; set; }
             public Brush Color { get; set; }
             public bool IsCurrent { get; set; }
+            public bool IsClicked { get; set; }
         }
 
         public class HourData

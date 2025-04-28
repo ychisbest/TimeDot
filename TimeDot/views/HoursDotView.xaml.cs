@@ -23,6 +23,9 @@ namespace TimeDot.views
     public partial class HoursDotView : UserControl
     {
         DispatcherTimer timer;
+
+        List<int> selectedMinutes = new List<int>();
+
         public HoursDotView()
         {
             InitializeComponent();
@@ -40,7 +43,7 @@ namespace TimeDot.views
             var now = DateTime.Now;
             var currentHour = now.Hour;
             var currentMinute = now.Minute - 1;
-            const int startHour = 0;
+            const int startHour = 8;
             const int endHour = 24;
             var hours = new List<HourData>();
 
@@ -56,9 +59,11 @@ namespace TimeDot.views
                 {
                     var minuteData = new MinuteData();
 
+                    minuteData.Count=hour*60+ minute;
+
                     if (hour < currentHour || (hour == currentHour && minute < currentMinute))
                     {
-                        minuteData.Color = Brushes.White;
+                        minuteData.Color = Brushes.Black;
 
                         minuteData.IsCurrent = false;
                     }
@@ -69,10 +74,16 @@ namespace TimeDot.views
                     }
                     else
                     {
-                        minuteData.Color = Brushes.DarkGray;
+                        minuteData.Color = Brushes.LightGray;
 
                         minuteData.IsCurrent = false;
                     }
+
+                    if (selectedMinutes.IndexOf(minuteData.Count)>0)
+                    {
+                        minuteData.Color=Brushes.Yellow;
+                    }
+
 
                     hourData.Minutes.Add(minuteData);
                 }
@@ -83,7 +94,16 @@ namespace TimeDot.views
             TimeGrid.ItemsSource = hours;
         }
 
+        private void r_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+           var minute= ((sender as FrameworkElement).DataContext as MinuteData);
 
+            if(selectedMinutes.IndexOf(minute.Count)>0)
+                selectedMinutes.Remove(minute.Count);
+            else selectedMinutes.Add(minute.Count);
+
+            UpdateTimeGrid();
+        }
     }
 
 }
