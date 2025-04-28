@@ -1,44 +1,76 @@
 ﻿<Window x:Class="TimeDot.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        ResizeMode="CanResizeWithGrip"
+
         Background="Transparent"
-        WindowStyle="None"
+  
         Topmost="True"
-        AllowsTransparency="True"
+
         ShowInTaskbar="False"
         xmlns:local="clr-namespace:TimeDot"
         x:Name="Window"
         xmlns:view="clr-namespace:TimeDot.views"
-        Title="TimeDot" Height="100" Width="400" MouseLeftButtonDown="Window_MouseLeftButtonDown" MouseDoubleClick="doubleClick">
-
-    <Window.Resources>
-        <local:BorderColorConverter x:Key="BorderColorConverter"></local:BorderColorConverter>
-    </Window.Resources>
+        Title="TimeDot" Height="90" Width="350" MouseLeftButtonDown="Window_MouseLeftButtonDown" MouseDoubleClick="doubleClick">
     <WindowChrome.WindowChrome>
         <WindowChrome CaptionHeight="0"
                       GlassFrameThickness="-1"
                       ResizeBorderThickness="5"
+                      UseAeroCaptionButtons="False"
                       ></WindowChrome>
     </WindowChrome.WindowChrome>
-    <Border CornerRadius="5" Background="#EEFFFFFF" Padding="10" BorderThickness="1" BorderBrush="{Binding ElementName=Window,Path=Topmost,Converter={StaticResource BorderColorConverter}}">
-        
-        <Border.ContextMenu>
-            <ContextMenu>
-                <MenuItem Header="Hide for five minutes"  Click="hidenClick">
-                </MenuItem>
-                <MenuItem Header="Topmost"  Click="TopmostClick">
-                </MenuItem>
-                <MenuItem Header="About" Click="AboutClick">
-                    
-                </MenuItem>
-                <MenuItem Header="Exit" Click="ExitClick">
 
+    <!-- 资源区：一支柔和的多彩画刷 + 对应动画 -->
+    <Window.Resources>
+        <!-- Storyboard：持续 15 秒滚动一次 -->
+        <Storyboard x:Key="FlowAnimation" RepeatBehavior="Forever">
+            <DoubleAnimation Storyboard.TargetName="stop1"
+                     Storyboard.TargetProperty="Offset"
+                     From="0"    To="1"    Duration="0:0:15"/>
+            <DoubleAnimation Storyboard.TargetName="stop2"
+                     Storyboard.TargetProperty="Offset"
+                     From="0.33" To="1.33" Duration="0:0:15"/>
+            <DoubleAnimation Storyboard.TargetName="stop3"
+                     Storyboard.TargetProperty="Offset"
+                     From="0.66" To="1.66" Duration="0:0:15"/>
+            <DoubleAnimation Storyboard.TargetName="stop4"
+                     Storyboard.TargetProperty="Offset"
+                     From="1"    To="2"    Duration="0:0:15"/>
+        </Storyboard>
+
+
+    </Window.Resources>
+    <Border Padding="10 0" CornerRadius="5" Background="#FFF">
+        <Border.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Hide for five minutes"  Click="hidenClick">
+                    </MenuItem>
+                    <MenuItem Header="Topmost"  Click="TopmostClick">
+                    </MenuItem>
+                <MenuItem Header="About" Click="AboutClick">
                 </MenuItem>
-            </ContextMenu>
-        </Border.ContextMenu>
-        <Viewbox>
-            <view:HoursDotView></view:HoursDotView>
-        </Viewbox>
+                    <MenuItem Header="Exit" Click="ExitClick">
+
+                    </MenuItem>
+                </ContextMenu>
+            </Border.ContextMenu>
+        <Grid>
+            <Rectangle Margin="-10 0"
+                   Stretch="Fill"
+                   IsHitTestVisible="False" >
+                <Rectangle.Fill>
+                    <!-- ★ 直接写在这里 ★ -->
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop x:Name="stop1" Color="#14FF9ED8" Offset="0"/>
+                        <GradientStop x:Name="stop2" Color="#14FFA17F" Offset="0.33"/>
+                        <GradientStop x:Name="stop3" Color="#14FFDB88" Offset="0.66"/>
+                        <GradientStop x:Name="stop4" Color="#14FF9ED8" Offset="1"/>
+                    </LinearGradientBrush>
+                </Rectangle.Fill>
+            </Rectangle>
+            <Viewbox>
+                <view:HoursDotView></view:HoursDotView>
+            </Viewbox>
+        </Grid>
     </Border>
+ 
 </Window>

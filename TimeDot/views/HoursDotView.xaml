@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TimeDot.views"
              mc:Ignorable="d" 
+             d:Height="100" d:Width="700"
             >
     <Grid>
         <Grid.RowDefinitions>
@@ -20,7 +21,7 @@
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel Orientation="Vertical" Margin="5 2">
+                    <StackPanel Orientation="Vertical" Margin="1 1">
                         <TextBlock Text="{Binding HourLabel}" 
                                        Foreground="#555"
                                       FontSize="8" FontWeight="Bold" 

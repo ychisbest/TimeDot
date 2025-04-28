@@ -24,6 +24,7 @@ using Color = System.Windows.Media.Color;
 using System.Threading.Tasks;
 using System.Threading;
 using Newtonsoft.Json;
+using System.Windows.Media.Animation;
 
 namespace TimeDot
 {
@@ -66,10 +67,6 @@ namespace TimeDot
         public MainWindow()
         {
             InitializeComponent();
-
-
-            JsonConvert.SerializeObject(new { });
-
 
             this.SourceInitialized += MainWindow_SourceInitialized;
             this.Loaded += MainWindow_Loaded;
@@ -153,6 +150,7 @@ namespace TimeDot
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             UpdateMenuCheckState();
+            ((Storyboard)Resources["FlowAnimation"]).Begin();
         }
 
         private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
@@ -216,7 +214,8 @@ namespace TimeDot
             // 取消之前的任务并释放资源
             if (_cts != null)
             {
-                _cts.Cancel();
+               if(!_cts.IsCancellationRequested)
+                    _cts.Cancel();
                 _cts.Dispose();
             }
 
