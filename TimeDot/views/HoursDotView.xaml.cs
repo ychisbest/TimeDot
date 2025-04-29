@@ -41,8 +41,9 @@ namespace TimeDot.views
         private void UpdateTimeGrid()
         {
             var now = DateTime.Now;
+            now=now.AddMinutes(-1);
             var currentHour = now.Hour;
-            var currentMinute = now.Minute - 1;
+            var currentMinute = now.Minute;
             const int startHour = 8;
             const int endHour = 24;
             var hours = new List<HourData>();
